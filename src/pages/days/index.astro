@@ -1,0 +1,240 @@
+---
+import Base from '../../layouts/Base.astro';
+import { days } from '../../data/trip';
+---
+<Base title="ימים 1–4 · סלובניה">
+
+<style>
+  /* גלריה */
+  .gallery {
+    display: flex;
+    gap: 8px;
+    margin: 14px 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+  .gallery img {
+    width: 260px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    display: block;
+    background: #e0d5c8;
+  }
+  .gallery img:only-child {
+    width: 100%;
+  }
+
+  /* כרטיס אטרקציה */
+  .attraction-card {
+    background: var(--warm);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .attraction-name {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 6px;
+  }
+  .attraction-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+  .attraction-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* כרטיס לינה */
+  .lodge-card {
+    background: linear-gradient(135deg, #f5f0e8, #faf7f2);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .lodge-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+  .lodge-info { flex: 1; }
+  .lodge-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--brown);
+  }
+  .lodge-address {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .lodge-times {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.8;
+  }
+  .lodge-note {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--terra);
+    margin-top: 3px;
+  }
+  .lodge-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  /* מפריד בין אטרקציות */
+  .attractions-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 16px 0 10px;
+  }
+</style>
+
+<div class="page-hero">
+  <div class="ph-icon">📅</div>
+  <h1>ימים 1–4</h1>
+  <p>אטרקציות · תמונות · לוח שעות · לינה</p>
+</div>
+
+<div class="wrap">
+
+  <div class="sec">
+    <div class="alert alert-ok">✅ כרטיסים מוזמנים: שקוצ'יאן · פוסטויניה · פליטביצה</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">📅 לוח יומי</div>
+    <button class="open-all-btn" id="open-all">פתח הכל</button>
+
+    {days.map(day => (
+      <div class="day-item" id={`day-${day.num}`}>
+
+        {/* כותרת */}
+        <div class="day-hdr">
+          <div class="day-num">{day.num}</div>
+          <div class="day-info">
+            <div class="day-title">{day.title}</div>
+            <div class="day-sub">{day.subtitle}</div>
+          </div>
+          <span class={`day-badge b-${day.type}`}>{day.badge}</span>
+          <div class="day-chev">▼</div>
+        </div>
+
+        <div class="day-body">
+
+          {/* התראות */}
+          {day.alerts && day.alerts.map(a => (
+            <div class={`alert alert-${a.type}`} style="margin-top:14px" set:html={a.text} />
+          ))}
+
+          {/* כרטיסי אטרקציות עם תמונות */}
+          <div class="attractions-header">📍 אטרקציות היום</div>
+          {day.attractions.map(attr => (
+            <div class="attraction-card">
+              <div class="attraction-name">{attr.name}</div>
+              <div class="gallery">
+                {attr.images.map(img => (
+                  <img
+                    src={img}
+                    alt={attr.name}
+                    loading="lazy"
+                    onerror="this.style.display='none'"
+                  />
+                ))}
+              </div>
+              <div class="attraction-desc">{attr.desc}</div>
+              <div class="attraction-links">
+                {attr.siteUrl && (
+                  <a href={attr.siteUrl} target="_blank" class="btn-site">🔗 אתר רשמי</a>
+                )}
+                <a href={attr.mapUrl} target="_blank" class="btn-map">📍 מפה</a>
+                {attr.googleMapsDir && (
+                  <a href={attr.googleMapsDir} target="_blank" class="btn-map">🚗 מסלול</a>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* לוח שעות */}
+          <div class="attractions-header" style="margin-top:20px">🕐 לוח שעות</div>
+          <div class="sched">
+            {day.schedule.map(item => (
+              <div class="srow">
+                <div class="stime">{item.time}</div>
+                <div class="sdesc">
+                  {item.desc}
+                  {item.duration && <div class="sdur">⏱ {item.duration}</div>}
+                  {item.links && (
+                    <div style="display:flex;flex-wrap:wrap;gap:0">
+                      {item.links.map(link => (
+                        <a href={link.url} target="_blank" class={`btn-${link.type}`}>
+                          {link.type === 'map' ? '📍' : link.type === 'waze' ? '🔵' : '🔗'} {link.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* הערה */}
+          {day.note && <div class="day-note">💡 {day.note}</div>}
+
+          {/* בונוס */}
+          {day.bonus && (
+            <div class="bonus-box">
+              <div class="bonus-lbl">💪 יש כוח?</div>
+              {day.bonus}
+            </div>
+          )}
+
+          {/* כרטיס לינה */}
+          <div class="lodge-card">
+            <div class="lodge-icon">🛏️</div>
+            <div class="lodge-info">
+              <div class="lodge-name">{day.accommodation.name}</div>
+              <div class="lodge-address">{day.accommodation.address}</div>
+              <div class="lodge-times">
+                ↗ צ'ק-אין: {day.accommodation.checkin}<br/>
+                ↙ צ'ק-אאוט: {day.accommodation.checkout}
+              </div>
+              {day.accommodation.notes && (
+                <div class="lodge-note">⚠️ {day.accommodation.notes}</div>
+              )}
+            </div>
+            <div class="lodge-btns">
+              <a href={day.accommodation.wazeUrl} target="_blank" class="btn-waze">🔵 Waze</a>
+              <a href={day.accommodation.mapUrl} target="_blank" class="btn-map">📍 מפה</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    ))}
+  </div>
+
+</div>
+</Base>

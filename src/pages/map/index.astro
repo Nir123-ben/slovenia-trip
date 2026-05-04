@@ -1,0 +1,126 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base title="מפה · סלובניה">
+
+<div class="page-hero">
+  <div class="ph-icon">🗺️</div>
+  <h1>מפה</h1>
+  <p>כל היעדים על מפה אחת</p>
+</div>
+
+<div class="wrap">
+
+  <div class="sec">
+    <div class="sec-title">🗺️ מסלול 4 הימים</div>
+    <div class="map-wrap">
+      <iframe
+        src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY&origin=Skocjan+Caves+Slovenia&destination=Terme+Catez+Slovenia&waypoints=Predjama+Castle+Slovenia|Postojna+Cave+Slovenia|Rastoke+Croatia|Plitvice+Lakes+Croatia&mode=driving"
+        style="height:320px"
+        allowfullscreen loading="lazy">
+      </iframe>
+    </div>
+    <div class="map-note">לחיצה על המפה פותחת ב-Google Maps עם כל הנקודות</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">📍 כל הנקודות</div>
+
+    <div class="card">
+      <div style="font-size:13px; line-height:2.4">
+        <div style="font-weight:700; color:var(--brown); margin-bottom:4px">יום 1</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span>🦇 מערת שקוצ'יאן</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Skocjan+Caves+Slovenia" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=45.7039,13.7920&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+            <a href="https://park-skocjanske-jame.si/en/" target="_blank" class="btn-site">🔗</a>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span>🏰 טירת פרדיאמה</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Predjama+Castle+Slovenia" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=45.8162,14.0004&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+            <a href="https://www.postojnska-jama.eu/en/predjama-castle/" target="_blank" class="btn-site">🔗</a>
+          </div>
+        </div>
+
+        <div style="font-weight:700; color:var(--brown); margin:12px 0 4px">יום 2</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span>🚂 מערת פוסטויניה</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Postojna+Cave+Slovenia" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=45.7817,14.2036&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+            <a href="https://www.postojnska-jama.eu/en/" target="_blank" class="btn-site">🔗</a>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span>🏘️ ראסטוקה</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rastoke+village+Croatia" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=44.8963,15.6244&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+          </div>
+        </div>
+
+        <div style="font-weight:700; color:var(--brown); margin:12px 0 4px">יום 3</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span>🌊 פליטביצה — כניסה 1</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Plitvice+Lakes+Entrance+1" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=44.8658,15.6219&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+            <a href="https://np-plitvicka-jezera.hr" target="_blank" class="btn-site">🔗</a>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span>🍽️ Bistro Plum</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Bistro+Plum+Rakovica+Croatia" target="_blank" class="btn-map">📍</a>
+            <a href="https://www.hotel-degenija.com" target="_blank" class="btn-site">🔗 רזרבציה</a>
+          </div>
+        </div>
+
+        <div style="font-weight:700; color:var(--brown); margin:12px 0 4px">יום 4</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0">
+          <span>🏊 Terme Čatež</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Terme+Catez+Slovenia" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=45.8958,15.5969&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+            <a href="https://www.terme-catez.si/en/" target="_blank" class="btn-site">🔗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">🏠 לינות</div>
+    <div class="card">
+      <div style="font-size:13px; line-height:2.4">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span><strong>Vila Lemic</strong> · Postojna</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rakitnik+30+Postojna" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=45.7784,14.2052&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
+          <span><strong>Flora House</strong> · Rastovača · 💵 מזומן!</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rastovaca+Plitvicka+Jezera" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=44.8800,15.6200&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0">
+          <span><strong>Guesthouse Les</strong> · Brežice</span>
+          <div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rimska+cesta+31+Brezice" target="_blank" class="btn-map">📍</a>
+            <a href="https://waze.com/ul?ll=45.9042,15.5903&navigate=yes" target="_blank" class="btn-waze">🔵</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</Base>

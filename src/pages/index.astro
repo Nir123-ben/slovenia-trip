@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import { tripTitle, tripSub, days } from '../data/trip';
+---
+<Base title={tripTitle}>
+
+<div class="hero">
+  <div class="hero-icon">🏔️</div>
+  <h1>{tripTitle}</h1>
+  <div class="hero-sub">{tripSub}</div>
+  <div class="hero-pill">מערות · פליטביצה · Čatež — 4 ימים ראשונים</div>
+</div>
+
+<div class="wrap">
+
+  <div class="sec">
+    <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-box"><div class="stat-val">4</div><div class="stat-lbl">ימים</div></div>
+      <div class="stat-box"><div class="stat-val">2</div><div class="stat-lbl">מערות</div></div>
+      <div class="stat-box"><div class="stat-val">1</div><div class="stat-lbl">UNESCO</div></div>
+      <div class="stat-box"><div class="stat-val">3</div><div class="stat-lbl">לינות</div></div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="sec">
+    <div class="sec-title">🗺️ המסלול</div>
+    <div class="map-wrap">
+      <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=13.5,44.7,15.8,46.5&layer=mapnik&marker=45.7,14.2"
+        allowfullscreen loading="lazy">
+      </iframe>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; margin-top:8px">
+      <a class="btn-map" href="https://www.google.com/maps/dir/Skocjan+Caves+Slovenia/Predjama+Castle+Slovenia/Postojna+Cave+Slovenia/Rastoke+Croatia/Plitvice+Lakes+Croatia/Terme+Catez+Slovenia" target="_blank">📍 פתח מסלול מלא ב-Google Maps</a>
+    </div>
+  </div>
+
+  <!-- DAYS OVERVIEW -->
+  <div class="sec">
+    <div class="sec-title">📅 סקירת ימים</div>
+    {days.map(day => (
+      <a href={`/slovenia-trip/days/#day-${day.num}`} style="text-decoration:none; display:block; margin-bottom:10px">
+        <div class="card" style="cursor:pointer; transition: transform .18s" onmouseenter="this.style.transform='scale(1.01)'" onmouseleave="this.style.transform='scale(1)'">
+          <div style="display:flex; align-items:center; gap:12px">
+            <div style="font-family:'Fraunces',serif; font-size:22px; font-weight:700; color:var(--terra); min-width:36px">{day.num}</div>
+            <div style="flex:1">
+              <div style="font-size:15px; font-weight:700; color:var(--brown)">{day.title}</div>
+              <div style="font-size:12px; color:var(--muted); margin-top:2px">{day.subtitle}</div>
+            </div>
+            <span class={`day-badge b-${day.type}`}>{day.badge}</span>
+            <span style="color:var(--muted)">←</span>
+          </div>
+        </div>
+      </a>
+    ))}
+    <a href="/slovenia-trip/days/" class="open-all-btn" style="display:inline-block; text-decoration:none; text-align:center; width:100%; margin-top:4px">
+      לכל הימים המפורטים ←
+    </a>
+  </div>
+
+  <!-- QUICK LINKS -->
+  <div class="sec">
+    <div class="sec-title">⚡ קישורים מהירים</div>
+    <div class="grid2">
+      <a href="https://park-skocjanske-jame.si/en/" target="_blank" style="text-decoration:none">
+        <div class="card" style="text-align:center; padding:20px 14px; cursor:pointer">
+          <div style="font-size:28px">🦇</div>
+          <div style="font-size:14px; font-weight:700; color:var(--brown); margin-top:8px">שקוצ'יאן</div>
+          <div style="font-size:11px; color:var(--muted)">אתר רשמי + כרטיסים</div>
+        </div>
+      </a>
+      <a href="https://www.postojnska-jama.eu/en/" target="_blank" style="text-decoration:none">
+        <div class="card" style="text-align:center; padding:20px 14px; cursor:pointer">
+          <div style="font-size:28px">🚂</div>
+          <div style="font-size:14px; font-weight:700; color:var(--brown); margin-top:8px">פוסטויניה</div>
+          <div style="font-size:11px; color:var(--muted)">אתר רשמי + כרטיסים</div>
+        </div>
+      </a>
+      <a href="https://np-plitvicka-jezera.hr" target="_blank" style="text-decoration:none">
+        <div class="card" style="text-align:center; padding:20px 14px; cursor:pointer">
+          <div style="font-size:28px">🌊</div>
+          <div style="font-size:14px; font-weight:700; color:var(--brown); margin-top:8px">פליטביצה</div>
+          <div style="font-size:11px; color:var(--muted)">אתר רשמי + כרטיסים</div>
+        </div>
+      </a>
+      <a href="https://www.terme-catez.si/en/" target="_blank" style="text-decoration:none">
+        <div class="card" style="text-align:center; padding:20px 14px; cursor:pointer">
+          <div style="font-size:28px">🏊</div>
+          <div style="font-size:14px; font-weight:700; color:var(--brown); margin-top:8px">Terme Čatež</div>
+          <div style="font-size:11px; color:var(--muted)">אתר רשמי + כניסה</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="sec">
+    <div class="sec-title">🔔 לזכור</div>
+    <div class="alert alert-ok">✅ כרטיסי שקוצ'יאן, פוסטויניה ופליטביצה — מוזמנים מראש</div>
+    <div class="alert alert-warn">⚠️ פוסטויניה: להגיע 08:45 — 15 דק' לפני הסיור!</div>
+    <div class="alert alert-warn">💵 Flora House (פליטביצה): תשלום מזומן בלבד במקום</div>
+    <div class="alert alert-info">📱 לסמן נקודות P3 ו-St3 על הטלפון לפני כניסה לפליטביצה</div>
+  </div>
+
+</div>
+</Base>
