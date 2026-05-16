@@ -1,0 +1,596 @@
+---
+// src/pages/days/[day]/index.astro
+
+import { days } from '../../../data/trip.ts';
+import { dayContent } from '../../../data/rich-content.ts';
+import { toSlug } from '../../../utils/slugs.ts';
+
+export function getStaticPaths() {
+  return days.map(day => ({
+    params: { day: String(day.num) },
+    props: { day },
+  }));
+}
+
+const { day } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const dc = dayContent[day.num];
+
+// Date mapping
+const dates: Record<number, string> = {
+  1: 'רביעי · 6.8',  2: 'חמישי · 7.8',  3: 'שישי · 8.8',
+  4: 'שבת · 9.8',    5: 'ראשון · 10.8', 6: 'שני · 11.8',
+  7: 'שלישי · 12.8', 8: 'רביעי · 13.8', 9: 'חמישי · 14.8',
+  10: 'שישי · 15.8', 11: 'שבת · 16.8',  12: 'ראשון · 17.8',
+  13: 'שני · 18.8',
+};
+const dateStr = dates[day.num] ?? `יום ${day.num}`;
+---
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יום — סלובניה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;padding:0">
+<style>
+  :root {
+    --day-bg:     #0d1a14;
+    --day-green:  #5de8a0;
+    --day-gold:   #ffd250;
+    --day-border: rgba(255,255,255,0.08);
+    --day-surface:#16241b;
+    --day-muted:  rgba(255,255,255,0.45);
+  }
+
+  /* ── HERO ── */
+  .day-hero {
+    background: var(--day-bg);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: #e8ece9;
+  }
+  .day-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 10% 90%, rgba(93,232,160,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 90% 10%, rgba(255,210,80,0.08) 0%, transparent 50%);
+  }
+  .day-hero-inner {
+    position: relative;
+    padding: 40px 22px 28px;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .day-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--day-muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+  .day-back:hover { color: var(--day-green); }
+  .day-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .day-num-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--day-green);
+    border: 1px solid rgba(93,232,160,0.35);
+    padding: 3px 10px;
+    border-radius: 3px;
+  }
+  .day-date {
+    font-size: 11px;
+    color: var(--day-muted);
+    letter-spacing: 0.08em;
+  }
+  .day-title {
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .day-subtitle {
+    font-size: 14px;
+    color: var(--day-muted);
+    font-weight: 300;
+  }
+
+  /* ── DEPARTURE STRIP ── */
+  .depart-strip {
+    background: #1a0f00;
+    border-bottom: 1px solid rgba(255,210,80,0.2);
+  }
+  .depart-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 14px 20px;
+  }
+  .depart-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--day-gold);
+    margin-bottom: 10px;
+  }
+  .depart-rows { display: flex; flex-direction: column; gap: 6px; }
+  .depart-row {
+    display: flex;
+    gap: 14px;
+    font-size: 13px;
+    align-items: flex-start;
+  }
+  .depart-time {
+    color: var(--day-gold);
+    font-weight: 700;
+    direction: ltr;
+    min-width: 40px;
+    flex-shrink: 0;
+  }
+  .depart-time.green { color: var(--day-green); }
+  .depart-text { color: rgba(255,255,255,0.75); line-height: 1.5; }
+  .depart-hotel-alert {
+    margin-top: 10px;
+    background: rgba(255,210,80,0.08);
+    border: 1px solid rgba(255,210,80,0.25);
+    border-radius: 4px;
+    padding: 8px 13px;
+    font-size: 12px;
+    color: rgba(255,210,80,0.9);
+    line-height: 1.65;
+  }
+
+  /* ── BODY ── */
+  .day-body-wrap {
+    background: var(--day-bg);
+    color: #e8ece9;
+    min-height: calc(100vh - 300px);
+  }
+  .day-body {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 18px 64px;
+  }
+  .day-sec {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--day-border);
+  }
+  .day-sec:last-child { border-bottom: none; }
+  .day-sec-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .day-sec-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--day-green);
+  }
+  .day-sec-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── ATTRACTION CARDS ── */
+  .attr-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .attr-card {
+    background: var(--day-surface);
+    border: 1px solid var(--day-border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: pointer;
+  }
+  .attr-card:hover {
+    border-color: rgba(93,232,160,0.35);
+    transform: translateY(-1px);
+  }
+  .attr-img {
+    width: 100px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #0a1a10;
+  }
+  .attr-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.8) saturate(0.9);
+  }
+  .attr-body {
+    padding: 14px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .attr-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .attr-desc {
+    font-size: 12px;
+    color: var(--day-muted);
+    line-height: 1.55;
+    flex: 1;
+    margin-bottom: 10px;
+  }
+  .attr-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .attr-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .attr-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: rgba(93,232,160,0.1);
+    border: 1px solid rgba(93,232,160,0.25);
+    color: var(--day-green);
+    letter-spacing: 0.06em;
+  }
+  .attr-arrow {
+    font-size: 18px;
+    color: var(--day-green);
+    font-weight: 300;
+  }
+
+  /* ── SCHEDULE ── */
+  .sched { display: flex; flex-direction: column; }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 48px 12px 1fr;
+    gap: 0 10px;
+  }
+  .sched-time {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--day-muted);
+    direction: ltr;
+    text-align: left;
+    padding-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .sched-row.hl .sched-time { color: var(--day-green); }
+  .sched-mid { display: flex; flex-direction: column; align-items: center; }
+  .sched-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .sched-row.hl .sched-dot {
+    background: var(--day-green);
+    border-color: var(--day-green);
+    width: 10px; height: 10px;
+    margin-top: 2px;
+    box-shadow: 0 0 8px rgba(93,232,160,0.5);
+  }
+  .sched-line {
+    flex: 1;
+    width: 1px;
+    background: var(--day-border);
+    margin: 4px auto 0;
+    min-height: 18px;
+  }
+  .sched-row.hl .sched-line { background: rgba(93,232,160,0.2); }
+  .sched-content { padding-bottom: 16px; }
+  .sched-desc {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+  }
+  .sched-row.hl .sched-desc { font-weight: 700; color: #fff; }
+  .sched-dur { font-size: 11px; color: var(--day-muted); margin-top: 2px; }
+  .sched-links { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+  .sl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+  }
+  .sl-waze { background: #1a1aff; color: white; }
+  .sl-map  { background: #e8f0fe; color: #1a55d4; }
+  .sl-site { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid var(--day-border); }
+
+  /* ── LODGE ── */
+  .lodge-mini {
+    background: var(--day-surface);
+    border: 1px solid var(--day-border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .lodge-mini-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 3px;
+  }
+  .lodge-mini-addr {
+    font-size: 12px;
+    color: var(--day-muted);
+    margin-bottom: 12px;
+  }
+  .lodge-mini-facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .lmf {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--day-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .lmf-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--day-muted); margin-bottom: 2px; }
+  .lmf-val { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85); }
+  .lodge-mini-note {
+    background: rgba(255,210,80,0.08);
+    border-right: 2px solid var(--day-gold);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: rgba(255,210,80,0.9);
+    border-radius: 2px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .lodge-mini-btns { display: flex; gap: 7px; }
+  .lmb {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 7px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+  }
+  .lmb-waze { background: #1a1aff; color: white; }
+  .lmb-map  { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); border: 1px solid var(--day-border); }
+
+  /* ── RESPONSIVE ── */
+  @media (min-width: 600px) {
+    .attr-img { width: 130px; }
+  }
+</style>
+
+<!-- HERO -->
+<div class="day-hero">
+  <div class="day-hero-inner">
+    <a class="day-back" href={`${base}/days/`}>← כל הימים</a>
+    <div class="day-meta">
+      <span class="day-num-badge">יום {day.num}</span>
+      <span class="day-date">{dateStr}</span>
+    </div>
+    <h1 class="day-title">{day.title}</h1>
+    <p class="day-subtitle">{day.subtitle}</p>
+  </div>
+</div>
+
+<!-- DEPARTURE STRIP — אוטומטי מ-trip.ts -->
+{day.schedule && day.schedule.length > 0 && (
+  <div class="depart-strip">
+    <div class="depart-inner">
+      <div class="depart-label">⏰ לוח בוקר</div>
+      <div class="depart-rows">
+        {day.schedule.slice(0, 4).map((item, i) => {
+          const isGreen = i >= 2;
+          return (
+            <div class="depart-row">
+              <span class={`depart-time${isGreen ? ' green' : ''}`}>{item.time}</span>
+              <span class="depart-text">{item.desc}</span>
+            </div>
+          );
+        })}
+      </div>
+      {dc?.hotelAlert && (
+        <div class="depart-hotel-alert">
+          ⚠️ {dc.hotelAlert}
+          {dc.hotelPhone && (
+            <span> · <a href={`tel:${dc.hotelPhone}`} style="color:var(--day-gold)">{dc.hotelName}</a></span>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+<!-- BODY -->
+<div class="day-body-wrap">
+<div class="day-body">
+
+  <!-- ATTRACTIONS -->
+  <div class="day-sec">
+    <div class="day-sec-head">
+      <span class="day-sec-num">01</span>
+      <span class="day-sec-title">אטרקציות</span>
+    </div>
+    <div class="attr-cards">
+      {day.attractions.map((attr, i) => {
+        const slug = toSlug(attr.name, i);
+        const img = attr.images?.[0];
+        return (
+          <a class="attr-card" href={`${base}/days/${day.num}/${slug}/`}>
+            {img && (
+              <div class="attr-img">
+                <img src={img} alt={attr.name} loading="lazy" />
+              </div>
+            )}
+            <div class="attr-body">
+              <div class="attr-name">{attr.name}</div>
+              <div class="attr-desc">{attr.desc.slice(0, 80)}...</div>
+              <div class="attr-footer">
+                <div class="attr-tags">
+                  <span class="attr-tag">פרטים מלאים</span>
+                </div>
+                <span class="attr-arrow">→</span>
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="day-sec">
+    <div class="day-sec-head">
+      <span class="day-sec-num">02</span>
+      <span class="day-sec-title">לוח שעות</span>
+    </div>
+    <div class="sched">
+      {day.schedule.map((item, i) => {
+        const isHighlight = item.links && item.links.length > 0;
+        const isLast = i === day.schedule.length - 1;
+        return (
+          <div class={`sched-row${isHighlight ? ' hl' : ''}`}>
+            <div class="sched-time">{item.time}</div>
+            <div class="sched-mid">
+              <div class="sched-dot"></div>
+              {!isLast && <div class="sched-line"></div>}
+            </div>
+            <div class="sched-content">
+              <div class="sched-desc">{item.desc}</div>
+              {item.duration && <div class="sched-dur">⏱ {item.duration}</div>}
+              {item.links && item.links.length > 0 && (
+                <div class="sched-links">
+                  {item.links.map(link => (
+                    <a
+                      class={`sl-btn sl-${link.type}`}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      {link.type === 'waze' ? '🔵' : link.type === 'map' ? '📍' : '🔗'} {link.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  {day.alerts && day.alerts.length > 0 && (
+    <div class="day-sec">
+      <div class="day-sec-head">
+        <span class="day-sec-num">03</span>
+        <span class="day-sec-title">לשים לב</span>
+      </div>
+      {day.alerts.map(alert => (
+        <div class={`alert alert-${alert.type}`} style="margin-bottom:8px"
+             set:html={alert.text} />
+      ))}
+    </div>
+  )}
+
+  <!-- LODGE -->
+  <div class="day-sec">
+    <div class="day-sec-head">
+      <span class={`day-sec-num`}>{day.alerts && day.alerts.length > 0 ? '04' : '03'}</span>
+      <span class="day-sec-title">לינה הלילה</span>
+    </div>
+    <div class="lodge-mini">
+      <div class="lodge-mini-name">{day.accommodation.name}</div>
+      <div class="lodge-mini-addr">{day.accommodation.address}</div>
+      <div class="lodge-mini-facts">
+        <div class="lmf">
+          <div class="lmf-lbl">צ'ק-אין</div>
+          <div class="lmf-val">{day.accommodation.checkin}</div>
+        </div>
+        <div class="lmf">
+          <div class="lmf-lbl">צ'ק-אאוט</div>
+          <div class="lmf-val">{day.accommodation.checkout}</div>
+        </div>
+      </div>
+      {day.accommodation.notes && (
+        <div class="lodge-mini-note">{day.accommodation.notes}</div>
+      )}
+      <div class="lodge-mini-btns">
+        <a class="lmb lmb-waze" href={day.accommodation.wazeUrl} target="_blank" rel="noopener">🔵 Waze</a>
+        <a class="lmb lmb-map"  href={day.accommodation.mapUrl}  target="_blank" rel="noopener">📍 מפה</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTE / BONUS -->
+  {day.note && (
+    <div style="padding:0 0 16px">
+      <div class="day-note" style="background:rgba(255,255,255,0.04);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--day-muted);line-height:1.7">
+        💡 {day.note}
+      </div>
+    </div>
+  )}
+  {day.bonus && (
+    <div style="padding:0 0 16px">
+      <div style="background:rgba(93,232,160,0.06);border:1px solid rgba(93,232,160,0.2);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--day-green);line-height:1.7">
+        {day.bonus}
+      </div>
+    </div>
+  )}
+
+</div>
+</div>
+</body>
+</html>
