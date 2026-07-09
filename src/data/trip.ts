@@ -417,10 +417,11 @@ export const days: Day[] = [
     note: "יום אלפיני. שחייה אחרונה = סיום סנטימנטלי לבסיס בוהין.",
     bonus: "💪 יש כוח? תצפית Orlove Glave — 20 דק' הליכה מהתחנה העליונה. נוף 360°.",
   },
+];
 
-  // ═══════════════════════
-  // בסיס 3 — עמק הסוצ'ה
-  // ═══════════════════════
+// ═══════════════════════
+// בסיס 3 — עמק הסוצ'ה
+// ═══════════════════════
 
   // יום 9
   {
@@ -530,7 +531,7 @@ export const days: Day[] = [
   {
     num: 11,
     title: "🚣 ראפטינג Classic ⭐ — היום שיזכרו",
-    subtitle: "~8 ק״מ על נהר הסוצ'ה הטורקיז",
+    subtitle: "~8 ק"מ על נהר הסוצ'ה הטורקיז",
     type: "highlight",
     badge: "⭐ שיא",
     accommodation: {
@@ -545,7 +546,7 @@ export const days: Day[] = [
     attractions: [
       {
         name: "ראפטינג Classic — Sport Mix",
-        desc: "~8 ק״מ על הסוצ'ה הטורקיז עם מדריך. מסלול Boka–Trnovo. גלים, יופי, אקשן במינון נכון. ציוד מלא + ניאופרן + צילומים חינם. גיל מינימום: 6.",
+        desc: "~8 ק"מ על הסוצ'ה הטורקיז עם מדריך. מסלול Boka–Trnovo. גלים, יופי, אקשן במינון נכון. ציוד מלא + ניאופרן + צילומים חינם. גיל מינימום: 6.",
         images: [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Rafting_Soca_river_Slovenia.jpg/800px-Rafting_Soca_river_Slovenia.jpg",
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Soca_river_rafting.jpg/800px-Soca_river_rafting.jpg",
@@ -562,7 +563,7 @@ export const days: Day[] = [
     schedule: [
       { time: "07:30", desc: "ארוחת בוקר טובה — חובה לפני ראפטינג!", duration: "1 שע'" },
       { time: "08:30", desc: "📍 הגעה ל-Sport Mix", links: [{ label: "Waze", url: "https://waze.com/ul?ll=46.3368,13.5536&navigate=yes", type: "waze" }, { label: "sportmix.si", url: "https://www.sportmix.si", type: "site" }] },
-      { time: "09:00", desc: "🚣 ראפטינג Classic — ~8 ק״מ Boka→Trnovo", duration: "~3 שעות" },
+      { time: "09:00", desc: "🚣 ראפטינג Classic — ~8 ק"מ Boka→Trnovo", duration: "~3 שעות" },
       { time: "12:00", desc: "סיום + חזרה + מקלחות" },
       { time: "12:30", desc: "🍽️ ארוחת צהריים רעבה!" },
       { time: "14:00", desc: "🏊 מנוחה / שחייה", duration: "3 שע'" },
@@ -575,7 +576,7 @@ export const days: Day[] = [
   {
     num: 12,
     title: "🌲 יום חופשי בסוצ'ה",
-    subtitle: "שחייה, מנוחה — האחה״צ האחרון בנהר",
+    subtitle: "שחייה, מנוחה — האחה"צ האחרון בנהר",
     type: "light",
     badge: "יום קל",
     accommodation: {
@@ -606,7 +607,7 @@ export const days: Day[] = [
       { time: "18:00", desc: "🌙 ערב משפחתי + אריזה — מחר טסים!" },
     ],
     note: "אחרי ראפטינג — יום ללא תוכנית. הגוף צריך לנוח.",
-    bonus: "💪 יש כוח? מוזיאון קוביד (09:00–10:30) — פרס מוזיאון אירופה, שעה וחצי. בוקר תרבותי + אחה״צ חופשי לגמרי. או — Slap Boka: המפל הגבוה בסלובניה, 106 מ', 30 דק' הליכה.",
+    bonus: "💪 יש כוח? מוזיאון קוביד (09:00–10:30) — פרס מוזיאון אירופה, שעה וחצי. בוקר תרבותי + אחה"צ חופשי לגמרי. או — Slap Boka: המפל הגבוה בסלובניה, 106 מ', 30 דק' הליכה.",
   },
 
   // יום 13
