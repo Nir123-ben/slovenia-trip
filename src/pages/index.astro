@@ -1,24 +1,26 @@
 ---
 import Base from '../layouts/Base.astro';
 import { tripTitle, tripSub, days } from '../data/trip';
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 ---
 <Base title={tripTitle}>
 
 <div class="hero">
-  <div class="hero-icon">🏔️</div>
+  <div class="hero-icon">🇸🇮🇭🇷</div>
   <h1>{tripTitle}</h1>
   <div class="hero-sub">{tripSub}</div>
-  <div class="hero-pill">מערות · פליטביצה · Čatež — 4 ימים ראשונים</div>
+  <div class="hero-pill">סלובניה · קרואטיה · 13 ימים · קיץ</div>
 </div>
 
 <div class="wrap">
 
+  <!-- STATS -->
   <div class="sec">
     <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat-box"><div class="stat-val">4</div><div class="stat-lbl">ימים</div></div>
+      <div class="stat-box"><div class="stat-val">13</div><div class="stat-lbl">ימים</div></div>
       <div class="stat-box"><div class="stat-val">2</div><div class="stat-lbl">מערות</div></div>
-      <div class="stat-box"><div class="stat-val">1</div><div class="stat-lbl">UNESCO</div></div>
-      <div class="stat-box"><div class="stat-val">3</div><div class="stat-lbl">לינות</div></div>
+      <div class="stat-box"><div class="stat-val">2</div><div class="stat-lbl">UNESCO</div></div>
+      <div class="stat-box"><div class="stat-val">5</div><div class="stat-lbl">בסיסים</div></div>
     </div>
   </div>
 
@@ -36,12 +38,14 @@ import { tripTitle, tripSub, days } from '../data/trip';
     </div>
   </div>
 
-  <!-- DAYS OVERVIEW -->
+  <!-- DAYS — לוחצים ישירות לדף היום -->
   <div class="sec">
     <div class="sec-title">📅 סקירת ימים</div>
-    {days.map(day => (
-      <a href={`/slovenia-trip/days/#day-${day.num}`} style="text-decoration:none; display:block; margin-bottom:10px">
-        <div class="card" style="cursor:pointer; transition: transform .18s" onmouseenter="this.style.transform='scale(1.01)'" onmouseleave="this.style.transform='scale(1)'">
+    {days.filter(d => d.num > 0).map(day => (
+      <a href={`${base}/days/${day.num}/`} style="text-decoration:none; display:block; margin-bottom:10px">
+        <div class="card" style="cursor:pointer; transition:transform .18s; padding:14px 18px"
+          onmouseenter="this.style.transform='scale(1.01)'"
+          onmouseleave="this.style.transform='scale(1)'">
           <div style="display:flex; align-items:center; gap:12px">
             <div style="font-family:'Fraunces',serif; font-size:22px; font-weight:700; color:var(--terra); min-width:36px">{day.num}</div>
             <div style="flex:1">
@@ -49,19 +53,19 @@ import { tripTitle, tripSub, days } from '../data/trip';
               <div style="font-size:12px; color:var(--muted); margin-top:2px">{day.subtitle}</div>
             </div>
             <span class={`day-badge b-${day.type}`}>{day.badge}</span>
-            <span style="color:var(--muted)">←</span>
+            <span style="color:var(--muted)">→</span>
           </div>
         </div>
       </a>
     ))}
-    <a href="/slovenia-trip/days/" class="open-all-btn" style="display:inline-block; text-decoration:none; text-align:center; width:100%; margin-top:4px">
-      לכל הימים המפורטים ←
+    <a href={`${base}/days/`} class="open-all-btn" style="display:inline-block; text-decoration:none; text-align:center; width:100%; margin-top:4px">
+      כל הימים המפורטים →
     </a>
   </div>
 
   <!-- QUICK LINKS -->
   <div class="sec">
-    <div class="sec-title">⚡ קישורים מהירים</div>
+    <div class="sec-title">🔗 קישורים מהירים</div>
     <div class="grid2">
       <a href="https://park-skocjanske-jame.si/en/" target="_blank" style="text-decoration:none">
         <div class="card" style="text-align:center; padding:20px 14px; cursor:pointer">
@@ -91,17 +95,40 @@ import { tripTitle, tripSub, days } from '../data/trip';
           <div style="font-size:11px; color:var(--muted)">אתר רשמי + כניסה</div>
         </div>
       </a>
+      <a href="https://www.vintgar.si/en" target="_blank" style="text-decoration:none">
+        <div class="card" style="text-align:center; padding:20px 14px; cursor:pointer">
+          <div style="font-size:28px">🌿</div>
+          <div style="font-size:14px; font-weight:700; color:var(--brown); margin-top:8px">וינטגר</div>
+          <div style="font-size:11px; color:var(--muted)">אתר רשמי + כרטיסים</div>
+        </div>
+      </a>
+      <a href="https://www.sportmix.si" target="_blank" style="text-decoration:none">
+        <div class="card" style="text-align:center; padding:20px 14px; cursor:pointer">
+          <div style="font-size:28px">🚣</div>
+          <div style="font-size:14px; font-weight:700; color:var(--brown); margin-top:8px">Sport Mix</div>
+          <div style="font-size:11px; color:var(--muted)">ראפטינג — הוזמן ✅</div>
+        </div>
+      </a>
     </div>
   </div>
 
   <!-- ALERTS -->
   <div class="sec">
-    <div class="sec-title">🔔 לזכור</div>
-    <div class="alert alert-ok">✅ כרטיסי שקוצ'יאן, פוסטויניה ופליטביצה — מוזמנים מראש</div>
+    <div class="sec-title">🔔 זכור</div>
+    <div class="alert alert-ok">✅ כרטיסים מוזמנים: שקוצ'יאן · פוסטויניה · פליטביצה · וינטגר · ראפטינג</div>
     <div class="alert alert-warn">⚠️ פוסטויניה: להגיע 08:45 — 15 דק' לפני הסיור!</div>
-    <div class="alert alert-warn">💵 Flora House (פליטביצה): תשלום מזומן בלבד במקום</div>
-    <div class="alert alert-info">📱 לסמן נקודות P3 ו-St3 על הטלפון לפני כניסה לפליטביצה</div>
+    <div class="alert alert-warn">💵 Flora House (פליטביצה): תשלום במזומן בלבד</div>
+    <div class="alert alert-info">📍 לסמן נקודות P3 ו-St3 על הטלפון לפני כניסה לפליטביצה</div>
+    <div class="alert alert-info">📱 להוריד Digital Receptionist App לפני יום 9 (בווץ') — צ'ק-אין דיגיטלי</div>
   </div>
 
 </div>
+
+<style>
+  .day-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; letter-spacing:.05em; white-space:nowrap; }
+  .b-full      { background:#e8f4e8; color:#2a6e2a; }
+  .b-highlight { background:#fff3cd; color:#8a6000; }
+  .b-light     { background:#e8f0fe; color:#1a4db0; }
+  .b-transit   { background:#f0f0f0; color:#666; }
+</style>
 </Base>

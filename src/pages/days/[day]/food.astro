@@ -1,0 +1,104 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { days } from '../../../data/trip.ts';
+import { dayToAreas, foodHtml } from '../../../data/foodPages.ts';
+
+export function getStaticPaths() {
+  return days.map(day => ({
+    params: { day: String(day.num) },
+    props: { day },
+  }));
+}
+
+const { day } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const areaIds = dayToAreas[day.num] ?? [];
+const html = areaIds.map(id => foodHtml[id] ?? '').join('\n');
+
+const prev = days.find(d => d.num === day.num - 1);
+const next = days.find(d => d.num === day.num + 1);
+---
+
+<Base title={`יום ${day.num} — אוכל`}>
+<style is:global>
+  .foodpage { max-width: 760px; margin: 0 auto; }
+  .food-legend {
+    background: var(--warm); border: 1px solid var(--border); border-radius: var(--r);
+    padding: 12px 16px; margin: 14px auto; font-size: 14px; max-width: 760px; line-height: 1.9;
+  }
+  .food-legend .pill { display:inline-block; padding:2px 11px; border-radius:99px; font-weight:700; font-size:13px; }
+  .pill-g { background:#e7f7ee; color:#1faa59; }
+  .pill-a { background:#fdf3e3; color:#cf8413; }
+  .pill-r { background:#fdebef; color:#d23a55; }
+
+  .foodpage .fa-banner {
+    display:flex; gap:12px; align-items:center; background:#222a36; color:#fff;
+    border-radius:14px; padding:14px 18px; margin:26px 0 12px;
+  }
+  .foodpage .fa-emoji { font-size:26px; }
+  .foodpage .fa-title { font-size:18px; font-weight:800; }
+  .foodpage .fa-route { font-size:13px; opacity:.9; }
+
+  .foodpage .sub {
+    background:#eef0f4; border-radius:9px; padding:7px 13px; margin:18px 0 8px;
+    font-size:17px; font-weight:800; color:#27405e;
+  }
+  .foodpage .mini-h { font-size:15px; font-weight:800; color:#555; margin:12px 0 2px; }
+
+  .foodpage .card {
+    background: var(--warm); border:1px solid var(--border); border-radius:14px;
+    padding:14px 17px; margin:12px 0; box-shadow:0 2px 8px var(--shadow);
+    border-right:7px solid var(--border);
+  }
+  .foodpage .card.g { border-right-color:#1faa59; }
+  .foodpage .card.a { border-right-color:#d99323; }
+  .foodpage .card.r { border-right-color:#d23a55; }
+  .foodpage .card .name { font-size:18px; font-weight:800; color:var(--brown); margin-bottom:7px; }
+  .foodpage .badge { font-size:12.5px; font-weight:700; padding:2px 9px; border-radius:99px; margin-inline-start:5px; white-space:nowrap; }
+  .foodpage .badge.g { background:#e7f7ee; color:#1faa59; }
+  .foodpage .badge.a { background:#fdf3e3; color:#cf8413; }
+  .foodpage .badge.r { background:#fdebef; color:#d23a55; }
+  .foodpage .row { font-size:14px; margin:5px 0; line-height:1.6; }
+  .foodpage .row.nav a { display:inline-block; background:#1a1aff; color:#fff; font-weight:700; text-decoration:none; padding:5px 13px; border-radius:8px; font-size:13.5px; }
+  .foodpage .note { background:#f4f1ea; border-radius:9px; padding:8px 12px; margin:7px 0; font-size:13.5px; color:#4a4135; }
+  .foodpage .warn { background:#fdebef; border-radius:9px; padding:8px 12px; margin:7px 0; font-size:13.5px; color:#a3283c; font-weight:600; }
+  .foodpage .card a, .foodpage .row a, .foodpage .note a, .foodpage .warn a { color: var(--blue); font-weight:700; text-decoration:none; }
+  .foodpage .card a:hover { text-decoration:underline; }
+  .foodpage .fa-extra { background:#fff; border:1px solid var(--border); border-radius:12px; padding:4px 15px; margin:14px 0; }
+  .foodpage .fa-extra summary { font-weight:800; cursor:pointer; padding:8px 0; font-size:15px; }
+  .foodpage p { font-size:14px; margin:7px 0; }
+
+  .food-cta-back {
+    display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
+    color:var(--terra); text-decoration:none; padding:8px 16px; border:1px solid var(--border);
+    border-radius:99px; background:var(--warm); margin:20px 0;
+  }
+  .food-daynav { display:flex; justify-content:space-between; gap:10px; margin:24px auto; max-width:760px; }
+  .food-daynav a { font-size:13px; font-weight:700; color:var(--terra); text-decoration:none; padding:6px 14px; border:1px solid var(--border); border-radius:99px; background:var(--warm); }
+</style>
+
+<div class="page-hero">
+  <div class="ph-icon">🍽️</div>
+  <h1>אוכל — יום {day.num}</h1>
+  <p>{day.title}</p>
+</div>
+
+<div class="wrap">
+  <a class="food-cta-back" href={`${base}/days/${day.num}/`}>← חזרה ליום {day.num}</a>
+
+  <div class="food-legend">
+    <b>מקרא מחיר</b> (למשפחה של 4): <span class="pill pill-g">💚 תקציבי</span> עד ~€80 ·
+    <span class="pill pill-a">💛 בינוני</span> ~€80–160 ·
+    <span class="pill pill-r">❤️ פינוק</span> €160+
+    <div style="font-size:12.5px;color:var(--muted);margin-top:6px">מקורות נקובים ומקושרים · היכן שהמקור חלש או לא אומת — צוין במפורש · אמתו ימי סגירה טלפונית לפני.</div>
+  </div>
+
+  <div class="foodpage" set:html={html} />
+
+  <div class="food-daynav">
+    {prev ? <a href={`${base}/days/${prev.num}/food/`}>← אוכל יום {prev.num}</a> : <span />}
+    <a href={`${base}/days/${day.num}/`} style="color:var(--muted)">📅 יום {day.num}</a>
+    {next ? <a href={`${base}/days/${next.num}/food/`}>אוכל יום {next.num} →</a> : <span />}
+  </div>
+</div>
+</Base>

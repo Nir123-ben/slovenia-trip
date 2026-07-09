@@ -4,7 +4,7 @@ interface Props {
   description?: string;
 }
 const { title, description = "מסלול סלובניה — מדריך טיול משפחתי" } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 ---
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -13,6 +13,12 @@ const base = import.meta.env.BASE_URL;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content={description}>
   <title>{title}</title>
+  <link rel="manifest" href={`${base}/manifest.webmanifest`}>
+  <meta name="theme-color" content="#2d1f14">
+  <link rel="icon" type="image/svg+xml" href={`${base}/icon.svg`}>
+  <link rel="apple-touch-icon" href={`${base}/icon.svg`}>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="סלובניה">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
@@ -272,9 +278,10 @@ const base = import.meta.env.BASE_URL;
     <a href={`${base}/`} class="nav-logo">🇸🇮 סלובניה</a>
     <div class="nav-links">
       <a href={`${base}/`}>ראשי</a>
-      <a href={`${base}/days/`}>ימים 1–4</a>
+      <a href={`${base}/days/`}>ימים 0–13</a>
       <a href={`${base}/map/`}>מפה</a>
       <a href={`${base}/tips/`}>טיפים</a>
+      <a href={`${base}/info/`}>חשוב</a>
     </div>
     <button class="ham" id="ham" aria-label="תפריט"><span></span><span></span><span></span></button>
   </div>
@@ -282,13 +289,19 @@ const base = import.meta.env.BASE_URL;
 <div class="drawer" id="drawer">
   <div class="drawer-sec">ניווט</div>
   <a href={`${base}/`}>🏠 ראשי</a>
-  <a href={`${base}/days/`}>📅 ימים 1–4</a>
+  <a href={`${base}/days/`}>📅 ימים 0–13</a>
   <a href={`${base}/map/`}>🗺️ מפה</a>
   <a href={`${base}/tips/`}>💡 טיפים</a>
+  <a href={`${base}/info/`}>⚠️ חשוב</a>
 </div>
 <div class="overlay" id="overlay"></div>
 
 <slot />
+
+<footer style="text-align:center; padding:26px 16px 34px; margin-top:44px; border-top:1px solid var(--border); font-size:11px; line-height:1.9; color:var(--muted)">
+  🇸🇮 מסלול סלובניה · מדריך משפחתי<br>
+  תמונות באדיבות <a href="https://commons.wikimedia.org" target="_blank" rel="noopener" style="color:var(--muted)">Wikimedia Commons</a> (רישיון חופשי) · מפות © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" style="color:var(--muted)">OpenStreetMap</a>, © CARTO
+</footer>
 
 <script>
   const ham = document.getElementById('ham');
@@ -314,6 +327,14 @@ const base = import.meta.env.BASE_URL;
       open = !open;
       document.querySelectorAll('.day-item').forEach(d => d.classList.toggle('open', open));
       oaBtn.textContent = open ? 'סגור הכל' : 'פתח הכל';
+    });
+  }
+</script>
+
+<script is:inline define:vars={{ base }}>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register(base + '/sw.js').catch(function () {});
     });
   }
 </script>

@@ -1,0 +1,423 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { days } from '../../../data/trip.ts';
+import { dayContent } from '../../../data/rich-content.ts';
+import { toSlug } from '../../../utils/slugs.ts';
+import { attractionGeo, lodgingGeo } from '../../../data/geo.ts';
+
+export function getStaticPaths() {
+  return days.map(day => ({
+    params: { day: String(day.num) },
+    props: { day },
+  }));
+}
+
+const { day } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const dc = dayContent[day.num];
+
+const prev = days.find(d => d.num === day.num - 1);
+const next = days.find(d => d.num === day.num + 1);
+
+const dayCoords: Record<number, string> = {
+  0:  '12.37,45.55,12.75,45.72',
+  1:  '13.60,45.60,14.20,45.90',
+  2:  '14.00,45.65,15.80,44.75',
+  3:  '15.50,44.75,15.75,45.00',
+  4:  '15.45,45.82,15.70,45.96',
+  5:  '13.80,46.20,14.30,46.45',
+  6:  '13.95,46.30,14.25,46.45',
+  7:  '13.90,46.28,14.15,46.44',
+  8:  '13.75,46.22,14.05,46.36',
+  9:  '13.40,46.18,14.10,46.40',
+  10: '13.42,46.28,13.62,46.42',
+  11: '13.46,46.30,13.62,46.38',
+  12: '13.42,46.28,13.62,46.40',
+  13: '12.20,45.38,12.50,45.52',
+};
+const bbox = dayCoords[day.num] ?? '13.50,45.50,15.00,46.50';
+
+// נקודות למפה האינטראקטיבית: אטרקציות היום + הלינה
+const mapPoints = [
+  ...day.attractions
+    .map((a, i) => ({ name: a.name, day: day.num, type: 'attraction', coord: attractionGeo[toSlug(a.name, i)] }))
+    .filter(p => p.coord),
+  ...(lodgingGeo[day.accommodation.name]
+    ? [{ name: day.accommodation.name, day: day.num, type: 'lodging', coord: lodgingGeo[day.accommodation.name] }]
+    : []),
+];
+---
+
+<Base title={`יום ${day.num} — ${day.title}`}>
+<style>
+  .day-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 4px;
+    gap: 10px;
+  }
+  .day-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--terra);
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    background: var(--warm);
+    transition: background .18s, border-color .18s;
+  }
+  .day-nav a:hover { background: var(--cream); border-color: var(--terra); }
+
+  .day-layout {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .day-sidebar {
+    display: none;
+    width: 210px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 66px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    padding: 20px 0 20px 14px;
+    border-left: 1px solid var(--border);
+  }
+  @media (min-width: 860px) {
+    .day-sidebar { display: block; }
+  }
+  .sidebar-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-right: 4px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 4px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background .15s;
+    border-bottom: 1px solid rgba(220,208,192,.3);
+  }
+  .sidebar-item:last-child { border-bottom: none; }
+  .sidebar-item:hover { background: var(--cream); }
+  .sidebar-item.current { background: var(--cream); }
+  .sidebar-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--terra);
+    min-width: 22px;
+    text-align: center;
+  }
+  .sidebar-text {
+    font-size: 11px;
+    color: var(--brown);
+    line-height: 1.3;
+    flex: 1;
+  }
+  .sidebar-item.current .sidebar-text { font-weight: 700; }
+  .sb-highlight { font-size: 9px; padding: 1px 5px; border-radius: 99px; background: #fff3cd; color: #8a6000; }
+
+  .day-main { flex: 1; min-width: 0; padding: 0 0 60px; }
+
+  .attr-card {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    background: var(--warm);
+    overflow: hidden;
+    text-decoration: none;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px var(--shadow);
+    transition: transform .15s, border-color .15s;
+  }
+  .attr-card:hover { transform: translateY(-1px); border-color: var(--terra); }
+  .attr-img-col { width: 90px; flex-shrink: 0; background: var(--cream); overflow: hidden; }
+  .attr-img-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .attr-body { padding: 14px 16px; flex: 1; }
+  .attr-name { font-size: 15px; font-weight: 800; color: var(--brown); margin-bottom: 4px; }
+  .attr-desc { font-size: 12px; color: var(--muted); line-height: 1.55; margin-bottom: 8px; }
+  .attr-more { font-size: 11px; font-weight: 700; color: var(--terra); }
+
+  .sched { display: flex; flex-direction: column; }
+  .srow { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(220,208,192,.5); align-items: flex-start; }
+  .srow:last-child { border-bottom: none; }
+  .stime { font-size: 13px; font-weight: 700; color: var(--terra); min-width: 46px; direction: ltr; text-align: left; padding-top: 2px; flex-shrink: 0; }
+  .sdesc { font-size: 14px; line-height: 1.6; flex: 1; }
+  .sdur  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .slinks { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+  .lodge-card { background: var(--warm); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px var(--shadow); }
+  .lodge-img { position: relative; margin: -16px -16px 14px; height: 150px; overflow: hidden; border-radius: var(--r) var(--r) 0 0; }
+  .lodge-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lodge-img-cap { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; padding: 3px 9px; border-radius: 99px; }
+  .lodge-name { font-size: 16px; font-weight: 700; color: var(--brown); margin-bottom: 2px; }
+  .lodge-addr { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .lodge-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+  .lf { background: var(--cream); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+  .lf-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 2px; }
+  .lf-val { font-size: 13px; font-weight: 700; color: var(--brown); }
+  .lodge-note { background: #fff7e0; border: 1px solid #e8c050; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #6a4800; margin-bottom: 12px; line-height: 1.65; }
+  .lodge-btns { display: flex; gap: 7px; }
+  .lb { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 8px 10px; border-radius: var(--r); text-decoration: none; }
+  .lb-waze { background: #1a1aff; color: white; }
+  .lb-map  { background: var(--cream); color: var(--brown); border: 1px solid var(--border); }
+
+  .day-note  { background: var(--cream); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .day-bonus { background: #eef4ff; border: 1px solid rgba(30,80,128,.2); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #1a4080; line-height: 1.7; margin-bottom: 10px; }
+  .hotel-strip { background: #fffaed; border-top: 2px solid #e8c050; border-bottom: 1px solid #e8c050; padding: 12px 18px; font-size: 13px; color: #6a4800; line-height: 1.65; }
+
+  .day-map-wrap { width: 100%; height: 220px; border: 0; border-radius: 10px; display: block; }
+  .map-btns { margin-top: 8px; display: flex; gap: 7px; flex-wrap: wrap; }
+
+  .food-cta {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 15px; font-weight: 800; text-decoration: none;
+    color: #fff; background: linear-gradient(135deg, #c05a30, #9c3f1f);
+    padding: 13px 18px; border-radius: var(--r); box-shadow: 0 2px 10px var(--shadow);
+    transition: transform .15s;
+  }
+  .food-cta:hover { transform: translateY(-1px); }
+</style>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="ph-icon">{day.num === 0 ? '✈️' : `יום ${day.num}`}</div>
+  <h1>{day.title}</h1>
+  <p>{day.subtitle}</p>
+</div>
+
+<!-- HOTEL ALERT -->
+{dc?.hotelAlert && (
+  <div class="hotel-strip">
+    ⚠️ {dc.hotelAlert}
+    {dc.hotelPhone && <> · <a href={`tel:${dc.hotelPhone}`} style="color:#8a6000;font-weight:700">{dc.hotelName}</a></>}
+  </div>
+)}
+
+<!-- PREV / NEXT TOP -->
+<div class="wrap" style="padding-bottom:0">
+  <div class="day-nav">
+    {prev ? <a href={`${base}/days/${prev.num}/`}>← יום {prev.num}</a> : <span />}
+    <a href={`${base}/days/`} style="color:var(--muted);font-size:12px;text-decoration:none">📅 כל הימים</a>
+    {next ? <a href={`${base}/days/${next.num}/`}>יום {next.num} →</a> : <span />}
+  </div>
+</div>
+
+<!-- FOOD CTA -->
+<div class="wrap" style="padding-top:8px;padding-bottom:0">
+  <a class="food-cta" href={`${base}/days/${day.num}/food/`}>🍽️ המלצות אוכל ליום זה →</a>
+</div>
+
+<!-- LAYOUT -->
+<div class="day-layout">
+
+  <!-- MAIN -->
+  <div class="day-main wrap">
+
+    <!-- ALERTS -->
+    {day.alerts && day.alerts.length > 0 && (
+      <div class="sec">
+        <div class="sec-title">⚠️ לשים לב</div>
+        {day.alerts.map(a => (
+          <div class={`alert alert-${a.type}`} set:html={a.text} />
+        ))}
+      </div>
+    )}
+
+    <!-- MAP -->
+    <div class="sec">
+      <div class="sec-title">🗺️ מפת היום</div>
+      {mapPoints.length > 0
+        ? <div id="daymap" class="day-map-wrap" style="height:300px"></div>
+        : <iframe
+            class="day-map-wrap"
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik`}
+            loading="lazy"
+            allowfullscreen>
+          </iframe>
+      }
+      <div class="map-btns">
+        <a class="btn-waze" href={day.accommodation.wazeUrl} target="_blank" rel="noopener">🔵 Waze ללינה</a>
+        <a class="btn-map"  href={day.accommodation.mapUrl}  target="_blank" rel="noopener">📍 מפה ללינה</a>
+        <a class="btn-map"  href={`${base}/map/`} style="background:var(--cream)">🗺️ כל המפה</a>
+      </div>
+    </div>
+
+    <!-- ATTRACTIONS -->
+    {day.attractions.length > 0 && (
+      <div class="sec">
+        <div class="sec-title">🏞️ אטרקציות</div>
+        {day.attractions.map((attr, i) => {
+          const slug = toSlug(attr.name, i);
+          const img = attr.images?.[0];
+          return (
+            <a class="attr-card" href={`${base}/days/${day.num}/${slug}/`}>
+              {img && (
+                <div class="attr-img-col">
+                  <img src={img} alt={attr.name} loading="lazy" />
+                </div>
+              )}
+              <div class="attr-body">
+                <div class="attr-name">{attr.name}</div>
+                <div class="attr-desc">{attr.desc.slice(0, 100)}…</div>
+                <div class="attr-more">פרטים מלאים →</div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+
+    <!-- SCHEDULE -->
+    <div class="sec">
+      <div class="sec-title">⏰ לוח שעות</div>
+      <div class="sched">
+        {day.schedule.map(item => (
+          <div class="srow">
+            <div class="stime">{item.time}</div>
+            <div style="flex:1">
+              <div class="sdesc">{item.desc}</div>
+              {item.duration && <div class="sdur">⏱ {item.duration}</div>}
+              {item.links && item.links.length > 0 && (
+                <div class="slinks">
+                  {item.links.map(link => (
+                    <a
+                      class={`btn-${link.type}`}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      {link.type === 'waze' ? '🔵' : link.type === 'map' ? '📍' : '🔗'} {link.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- ACCOMMODATION -->
+    <div class="sec">
+      <div class="sec-title">🏨 לינה</div>
+      <div class="lodge-card">
+        {day.accommodation.image && (
+          <div class="lodge-img">
+            <img src={day.accommodation.image} alt={day.accommodation.name} loading="lazy" />
+            {day.accommodation.imageCaption && <span class="lodge-img-cap">{day.accommodation.imageCaption}</span>}
+          </div>
+        )}
+        <div class="lodge-name">{day.accommodation.name}</div>
+        <div class="lodge-addr">{day.accommodation.address}</div>
+        <div class="lodge-facts">
+          <div class="lf"><div class="lf-lbl">צ'ק-אין</div><div class="lf-val">{day.accommodation.checkin}</div></div>
+          <div class="lf"><div class="lf-lbl">צ'ק-אאוט</div><div class="lf-val">{day.accommodation.checkout}</div></div>
+        </div>
+        {day.accommodation.notes && (
+          <div class="lodge-note">{day.accommodation.notes}</div>
+        )}
+        <div class="lodge-btns">
+          <a class="lb lb-waze" href={day.accommodation.wazeUrl} target="_blank" rel="noopener">🔵 Waze</a>
+          <a class="lb lb-map"  href={day.accommodation.mapUrl}  target="_blank" rel="noopener">📍 מפה</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTE / BONUS -->
+    {day.note  && <div class="day-note">💡 {day.note}</div>}
+    {day.bonus && <div class="day-bonus">{day.bonus}</div>}
+
+    <!-- PREV / NEXT BOTTOM -->
+    <div class="day-nav" style="margin-top:24px">
+      {prev ? <a href={`${base}/days/${prev.num}/`}>← יום {prev.num}</a> : <span />}
+      <a href={`${base}/days/`} style="color:var(--muted);font-size:12px;text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:99px;background:var(--warm)">📅 כל הימים</a>
+      {next ? <a href={`${base}/days/${next.num}/`}>יום {next.num} →</a> : <span />}
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="day-sidebar">
+    <div class="sidebar-title">ניווט מהיר</div>
+    {days.map(d => (
+      <a
+        class={`sidebar-item${d.num === day.num ? ' current' : ''}`}
+        href={`${base}/days/${d.num}/`}
+      >
+        <span class="sidebar-num">{d.num}</span>
+        <span class="sidebar-text">{d.title.slice(3, 26)}</span>
+        {d.type === 'highlight' && <span class="sb-highlight">⭐</span>}
+      </a>
+    ))}
+  </aside>
+
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script is:inline define:vars={{ mapPoints }}>
+  (function () {
+    var el = document.getElementById('daymap');
+    if (!el || typeof L === 'undefined' || !mapPoints.length) return;
+    var map = L.map('daymap', { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+      subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap, © CARTO'
+    }).addTo(map);
+    function icon(label, lodge) {
+      var d = lodge ? 30 : 27;
+      return L.divIcon({ className: '', iconSize: [d, d], iconAnchor: [d / 2, d / 2], popupAnchor: [0, -d / 2],
+        html: '<div style="width:' + d + 'px;height:' + d + 'px;border-radius:50%;background:' + (lodge ? '#e0a800' : '#1d9e75') + ';border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.5);color:#fff;font-weight:700;font-size:' + (lodge ? 15 : 13) + 'px;display:flex;align-items:center;justify-content:center;line-height:1">' + label + '</div>' });
+    }
+    function popup(p) {
+      var ll = p.coord[0] + ',' + p.coord[1];
+      return '<div style="min-width:150px"><div style="font-weight:700;font-size:13px;color:#1e140a">' + p.name + '</div>'
+        + '<div style="font-size:11px;color:#888;margin-bottom:7px">יום ' + p.day + '</div>'
+        + '<a href="https://waze.com/ul?ll=' + ll + '&navigate=yes" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#fff;background:#1a1aff;padding:4px 9px;border-radius:5px;text-decoration:none;margin-left:5px">Waze</a>'
+        + '<a href="https://www.google.com/maps/search/?api=1&query=' + ll + '" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#1a4a90;background:#deeafb;padding:4px 9px;border-radius:5px;text-decoration:none">Maps</a></div>';
+    }
+    var pts = [], n = 0;
+    mapPoints.forEach(function (p) {
+      var lodge = p.type === 'lodging';
+      L.marker([p.coord[0], p.coord[1]], { icon: icon(lodge ? '🏨' : ++n, lodge) })
+        .addTo(map).bindPopup(popup(p));
+      pts.push([p.coord[0], p.coord[1]]);
+    });
+    if (pts.length > 1) {
+      L.polyline(pts, { color: '#c05a30', weight: 3, opacity: 0.55, dashArray: '6,8' }).addTo(map);
+    }
+    if (pts.length === 1) map.setView(pts[0], 14);
+    else map.fitBounds(pts, { padding: [40, 40] });
+    var me = null;
+    map.on('locationfound', function (e) {
+      if (me) map.removeLayer(me);
+      me = L.circleMarker(e.latlng, { radius: 8, color: '#fff', weight: 3, fillColor: '#1a73e8', fillOpacity: 1 }).addTo(map).bindPopup('📍 אתה כאן');
+    });
+    var LocBtn = L.Control.extend({ options: { position: 'topleft' }, onAdd: function () {
+      var a = L.DomUtil.create('a', 'leaflet-bar');
+      a.href = '#'; a.title = 'המיקום שלי'; a.innerHTML = '📍';
+      a.style.cssText = 'width:34px;height:34px;line-height:34px;text-align:center;font-size:18px;background:#fff;display:block';
+      L.DomEvent.on(a, 'click', function (ev) { L.DomEvent.preventDefault(ev); map.locate({ setView: true, maxZoom: 14 }); });
+      return a;
+    } });
+    map.addControl(new LocBtn());
+  })();
+</script>
+</Base>

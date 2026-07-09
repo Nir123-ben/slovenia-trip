@@ -12,14 +12,58 @@ import Base from '../../layouts/Base.astro';
 <div class="wrap">
 
   <div class="sec">
+    <div class="sec-title">🔴 חובות — לפני היציאה</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="must-item warn">⚠️ <strong>מזומן אירו:</strong> Flora House (פליטביצה) — תשלום מזומן בלבד. לוודא סכום מול אישור ההזמנה לפני היציאה</div>
+      <div class="must-item warn">⚠️ <strong>מזומן לרכבת המכוניות:</strong> €27 למשפחה (רכב+נהג €16.20 + נוסע €3.60) — משלמים לקונדוקטור. יציאה 09:10, העמסה עד 09:00. מומלץ להודיע 24 שע' מראש: +386 1 291 33 91</div>
+      <div class="must-item warn">⚠️ <strong>Digital Receptionist App:</strong> להוריד לפני יום 9 — צ'ק-אין בווץ' הוא דיגיטלי בלבד. בלי האפליקציה — לא נכנסים</div>
+      <div class="must-item warn">⚠️ <strong>יתרי נהר Sport Mix:</strong> ~€84 לקבוצה — לוודא שהוסדר עם ההזמנה</div>
+      <div class="must-item ok">✅ <strong>כרטיסים מוזמנים:</strong> שקוצ'יאן · פוסטויניה · פליטביצה · וינטגר · ראפטינג</div>
+      <div class="must-item warn">⚠️ <strong>ויניטה דיגיטלית סלובניה (e-vinjeta):</strong> אין מדבקה פיזית! לקנות אונליין ב-DARS לפי מספר הרישוי מיד אחרי קבלת הרכב (~€16/שבוע). רכב שכור מאיטליה לא כולל אותה</div>
+      <div class="must-item warn">⚠️ <strong>לילה ראשון:</strong> להתקשר למלון בסן דונה — הגעה אחרי סגירת הקבלה (21:30). לוודא גם מול Europcar שהרכב שמור להגעה המאוחרת</div>
+      <div class="must-item ok">✅ <strong>חניה ונציה — יום 13:</strong> <a href="https://www.parclick.com" target="_blank">Garage San Marco (Piazzale Roma)</a> — לאמץ מראש דרך Parclick. ~€35</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">🛍️ קניות חובה ב-BTC — יום 5</div>
+    <div class="card">
+      <div style="font-size:13px; color:var(--muted); margin-bottom:12px">לפני ההגעה לסוצ'ה — BTC City Ljubljana הוא הסופרסטור הגדול בדרך. אחר כך אין איפה לקנות.</div>
+      <div style="font-size:13px; line-height:2.3">
+        <div>🤿 <strong>ניאופרן:</strong> אחד לכל ילד — קריטי לשחייה בנהר הסוצ'ה (14°C)</div>
+        <div>👟 <strong>נעלי מים:</strong> לכל 4 — לנהר ולסלעים</div>
+        <div>🧴 <strong>קרם שמש עמיד למים SPF 50+</strong> — לראפטינג</div>
+        <div>🎒 <strong>שקית יבש (Dry Bag):</strong> לטלפון ומסמכים בראפטינג</div>
+        <div>🧊 <strong>צידנית רכה:</strong> שימושית לכל הטיול</div>
+        <div>🛒 <strong>מזון — לא כאן!</strong> צ'ק-אין בבלד רק 15:00 — מוצרי קירור יתקלקלו ברכב. קונים בערב ב-Mercator/Spar בבלד</div>
+      </div>
+      <a href="https://www.btc.si" target="_blank" class="btn-site" style="display:inline-block;margin-top:10px">🔗 BTC City — אתר ומפה</a>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">🚗 נסיעה</div>
+    <div class="card">
+      <div style="font-size:13px; line-height:2.3">
+        <div>🗺️ <strong>ניווט:</strong> Waze ראשי. Google Maps offline לגיבוי — להוריד אזורים לפני הנחיתה</div>
+        <div>⏱️ <strong>זמני נסיעה:</strong> כבישים הרריים איטיים — לחשב x1.5 מה-GPS</div>
+        <div>🅿️ <strong>חניה:</strong> שקוצ'יאן — חינם · פוסטויניה — €3/שעה · פליטביצה — כלול · ונציה — €35 מראש</div>
+        <div>⛽ <strong>דלק:</strong> Benzin 95 (אוטומטי — לא Diesel!)</div>
+        <div>🚂 <strong>רכבת המכוניות:</strong> מזומן בלבד! לבדוק זמנים מראש ב-<a href="https://potniski.sz.si" target="_blank">potniski.sz.si</a></div>
+        <div>🏔️ <strong>ורשיץ:</strong> כביש צר ומתפתל — לנסוע לאט. עצירות לתצפית מומלצות</div>
+        <div>🌉 <strong>יום 13 — Predel Pass:</strong> 09:00 מבווץ' → ונציה 12:00. מסלול: Predel Pass → Tarvisio → A4</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
     <div class="sec-title">💶 כסף ותשלומים</div>
     <div class="card">
       <div style="font-size:13px; line-height:2.3">
         <div>💶 <strong>מטבע:</strong> אירו (€) — סלובניה וקרואטיה</div>
-        <div>💵 <strong>מזומן חובה:</strong> Flora House (פליטביצה) + רכבת המכוניות (בסיס 2)</div>
+        <div>💵 <strong>מזומן חובה:</strong> Flora House · רכבת המכוניות · Piazzale Roma (חניה)</div>
         <div>💳 <strong>כרטיס אשראי:</strong> מקובל בכל מקום אחר</div>
-        <div>🚗 <strong>מדבקת כביש סלובניה:</strong> ~€15 לשבוע — לקנות בתחנת דלק בכניסה</div>
-        <div>⛽ <strong>דלק:</strong> Benzin 95 (אוטומטי) — לא Diesel!</div>
+        <div>💱 <strong>המרה:</strong> Revolut / Wise — עמלות נמוכות</div>
       </div>
     </div>
   </div>
@@ -28,24 +72,11 @@ import Base from '../../layouts/Base.astro';
     <div class="sec-title">🌤️ לבוש וציוד</div>
     <div class="card">
       <div style="font-size:13px; line-height:2.3">
-        <div>🧥 <strong>שקוצ'יאן:</strong> 10°C בפנים — סוודר/ג'קט לכולם, גם בקיץ</div>
-        <div>🌊 <strong>הנהר (בסיס 2):</strong> ניאופרן חובה לשחייה ארוכה — לקנות ב-BTC לובליאנה</div>
-        <div>👟 <strong>נעליים:</strong> נעלי מים לנהר, נעלי הליכה לוינטגר/מוסטניצה</div>
-        <div>☀️ <strong>שמש:</strong> קרם SPF 50, כובעים — UV גבוה בהרים</div>
-        <div>🎒 <strong>תיק יומי:</strong> מים, קרם שמש, חטיפים, ג'קט קל, מטען נייד</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-title">🚗 נסיעה</div>
-    <div class="card">
-      <div style="font-size:13px; line-height:2.3">
-        <div>🗺️ <strong>ניווט:</strong> Waze עובד מצוין. להוריד מפות offline ב-Google Maps לפני</div>
-        <div>⏱️ <strong>זמני נסיעה:</strong> כבישים הרריים איטיים — לחשב x1.5 מה-GPS</div>
-        <div>🅿️ <strong>חניה:</strong> שקוצ'יאן חינם · פוסטויניה €3/שעה · פליטביצה כלול</div>
-        <div>🚂 <strong>רכבת המכוניות:</strong> מזומן בלבד! כיוון אחד: בוהין → סוצ'ה</div>
-        <div>🛣️ <strong>ורשיץ:</strong> כביש צר — לנסוע בנחת ולעצור לתצפיות</div>
+        <div>🧥 <strong>שקוצ'יאן + פוסטויניה:</strong> 10–12°C בפנים — סוודר/ג'קט לכולם, גם בקיץ</div>
+        <div>🌊 <strong>סוצ'ה:</strong> ניאופרן (מ-BTC) · נעלי מים · מגבת ייבוש מהיר</div>
+        <div>👟 <strong>הליכה:</strong> נעלי הליכה לוינטגר, מוסטניצה, קוזיאק — לא כפכפים</div>
+        <div>☀️ <strong>שמש:</strong> קרם SPF 50+, כובעים — UV גבוה בהרים</div>
+        <div>🎒 <strong>תיק יומי:</strong> מים 2L, חטיפים, קרם, ג'קט קל, מטען נייד</div>
       </div>
     </div>
   </div>
@@ -56,20 +87,11 @@ import Base from '../../layouts/Base.astro';
       <div style="font-size:13px; line-height:2.5">
         <div>🔵 <strong>Waze</strong> — ניווט ראשי</div>
         <div>🗺️ <strong>Google Maps</strong> — מפות offline + חיפוש</div>
-        <div>📱 <strong>Digital Receptionist</strong> — צ'ק-אין Bovec Apartment (בסיס 2, חובה!)</div>
-        <div>💱 <strong>Revolut / Wise</strong> — המרת מטבע זולה</div>
+        <div>📱 <strong>Digital Receptionist</strong> — צ'ק-אין בווץ' (חובה לפני יום 9!)</div>
+        <div>🥾 <strong>Mapy.cz</strong> — שבילי הליכה offline (מוסטניצה, קוזיאק)</div>
         <div>🌤️ <strong>Windy</strong> — תחזית הרים מדויקת</div>
-        <div>🗣️ <strong>Google Translate</strong> — סלובנית/קרואטית, מצלמה עובד!</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-title">🔌 חשמל</div>
-    <div class="card">
-      <div style="font-size:13px; line-height:2.3">
-        <div>🔌 <strong>שקעים:</strong> Type F (עגול אירופאי) — צריך מתאם</div>
-        <div>⚡ <strong>מתח:</strong> 230V / 50Hz — זהה לישראל, אין בעיה</div>
+        <div>💱 <strong>Revolut / Wise</strong> — המרת מטבע זולה</div>
+        <div>🗣️ <strong>Google Translate</strong> — מצלמה על שלטים עובדת מעולה</div>
       </div>
     </div>
   </div>
@@ -90,5 +112,28 @@ import Base from '../../layouts/Base.astro';
     </div>
   </div>
 
+  <div class="sec">
+    <div class="sec-title">🔌 חשמל</div>
+    <div class="card">
+      <div style="font-size:13px; line-height:2.3">
+        <div>🔌 <strong>שקעים:</strong> Type F (עגול אירופאי) — צריך מתאם</div>
+        <div>⚡ <strong>מתח:</strong> 230V / 50Hz — זהה לישראל, אין בעיה</div>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<style>
+  .must-item {
+    padding: 11px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    border-bottom: 1px solid var(--border);
+  }
+  .must-item:last-child { border-bottom: none; }
+  .must-item.warn { border-right: 3px solid var(--gold); background: #fffaed; }
+  .must-item.ok   { border-right: 3px solid #5ab55a; background: #f4fbf4; }
+  .must-item a { color: var(--terra); }
+</style>
 </Base>

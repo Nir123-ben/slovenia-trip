@@ -1,5 +1,29 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { days } from '../../data/trip.ts';
+import { toSlug } from '../../utils/slugs.ts';
+import { attractionGeo, lodgingGeo } from '../../data/geo.ts';
+
+const attractions = days
+  .flatMap(d => d.attractions.map((a, i) => ({
+    name: a.name,
+    day: d.num,
+    type: 'attraction',
+    coord: attractionGeo[toSlug(a.name, i)],
+  })))
+  .filter(p => p.coord);
+
+const seen = new Set<string>();
+const lodgings: { name: string; day: number; type: string; coord: [number, number] }[] = [];
+for (const d of days) {
+  const n = d.accommodation.name;
+  if (lodgingGeo[n] && !seen.has(n)) {
+    seen.add(n);
+    lodgings.push({ name: n, day: d.num, type: 'lodging', coord: lodgingGeo[n] });
+  }
+}
+const allPoints = [...attractions, ...lodgings];
+const route = lodgings.map(l => l.coord);
 ---
 <Base title="מפה · סלובניה">
 
@@ -9,118 +33,337 @@ import Base from '../../layouts/Base.astro';
   <p>כל היעדים על מפה אחת</p>
 </div>
 
+<style>
+  .map-full { width:100%; height:420px; border:0; border-radius:12px; display:block; }
+  .poi-group { margin-bottom:4px; }
+  .poi-label { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:14px 0 6px; }
+  .poi-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:9px 0; border-bottom:1px solid var(--border); gap:10px;
+  }
+  .poi-row:last-child { border-bottom:none; }
+  .poi-name { font-size:13px; color:var(--brown); font-weight:600; flex:1; }
+  .poi-btns { display:flex; gap:5px; flex-shrink:0; }
+  .poi-btns a {
+    font-size:11px; font-weight:700; padding:4px 8px; border-radius:6px;
+    text-decoration:none; white-space:nowrap;
+  }
+  .pb-map  { background:var(--cream); border:1px solid var(--border); color:var(--brown); }
+  .pb-waze { background:#1a1aff; color:white; }
+  .pb-site { background:var(--terra); color:white; }
+  .lodge-badge { font-size:10px; padding:2px 6px; border-radius:99px; background:#fff3cd; color:#8a6000; margin-right:4px; }
+  .day-badge-s { font-size:10px; padding:2px 6px; border-radius:99px; background:var(--cream); color:var(--muted); font-weight:700; margin-left:4px; }
+</style>
+
 <div class="wrap">
 
+  <!-- FULL ROUTE MAP -->
   <div class="sec">
-    <div class="sec-title">🗺️ מסלול 4 הימים</div>
-    <div class="map-wrap">
-      <iframe
-        src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY&origin=Skocjan+Caves+Slovenia&destination=Terme+Catez+Slovenia&waypoints=Predjama+Castle+Slovenia|Postojna+Cave+Slovenia|Rastoke+Croatia|Plitvice+Lakes+Croatia&mode=driving"
-        style="height:320px"
-        allowfullscreen loading="lazy">
-      </iframe>
+    <div class="sec-title">🗺️ המסלול המלא</div>
+    <div id="fullmap" class="map-full" style="height:460px"></div>
+    <div style="margin-top:8px; display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--muted)">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#5de8a0;border:1px solid #176b41;vertical-align:middle;margin-left:4px"></span>אטרקציה</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f0c050;border:1px solid #9a6f08;vertical-align:middle;margin-left:4px"></span>לינה</span>
+      <span><span style="display:inline-block;width:22px;border-top:2px dashed #c05a30;vertical-align:middle;margin-left:4px"></span>מסלול הנסיעה בין הבסיסים</span>
     </div>
-    <div class="map-note">לחיצה על המפה פותחת ב-Google Maps עם כל הנקודות</div>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+      <a class="btn-map" href="https://www.google.com/maps/dir/Skocjan+Caves+Slovenia/Predjama+Castle/Postojna+Cave/Rastoke+Croatia/Plitvice+Lakes/Terme+Catez/Lake+Bled/Lake+Bohinj/Bovec+Slovenia/Venice+Marco+Polo+Airport" target="_blank">
+        📍 מסלול מלא ב-Google Maps
+      </a>
+    </div>
   </div>
 
+  <!-- ALL POINTS OF INTEREST -->
   <div class="sec">
     <div class="sec-title">📍 כל הנקודות</div>
+    <div class="card" style="padding:0 16px">
 
-    <div class="card">
-      <div style="font-size:13px; line-height:2.4">
-        <div style="font-weight:700; color:var(--brown); margin-bottom:4px">יום 1</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span>🦇 מערת שקוצ'יאן</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Skocjan+Caves+Slovenia" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=45.7039,13.7920&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-            <a href="https://park-skocjanske-jame.si/en/" target="_blank" class="btn-site">🔗</a>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span>🏰 טירת פרדיאמה</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Predjama+Castle+Slovenia" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=45.8162,14.0004&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-            <a href="https://www.postojnska-jama.eu/en/predjama-castle/" target="_blank" class="btn-site">🔗</a>
-          </div>
-        </div>
+      <div class="poi-label">בסיס 1 — שקוצ'יאן / פליטביצה</div>
 
-        <div style="font-weight:700; color:var(--brown); margin:12px 0 4px">יום 2</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span>🚂 מערת פוסטויניה</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Postojna+Cave+Slovenia" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=45.7817,14.2036&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-            <a href="https://www.postojnska-jama.eu/en/" target="_blank" class="btn-site">🔗</a>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span>🏘️ ראסטוקה</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Rastoke+village+Croatia" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=44.8963,15.6244&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-          </div>
-        </div>
-
-        <div style="font-weight:700; color:var(--brown); margin:12px 0 4px">יום 3</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span>🌊 פליטביצה — כניסה 1</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Plitvice+Lakes+Entrance+1" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=44.8658,15.6219&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-            <a href="https://np-plitvicka-jezera.hr" target="_blank" class="btn-site">🔗</a>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span>🍽️ Bistro Plum</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Bistro+Plum+Rakovica+Croatia" target="_blank" class="btn-map">📍</a>
-            <a href="https://www.hotel-degenija.com" target="_blank" class="btn-site">🔗 רזרבציה</a>
-          </div>
-        </div>
-
-        <div style="font-weight:700; color:var(--brown); margin:12px 0 4px">יום 4</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0">
-          <span>🏊 Terme Čatež</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Terme+Catez+Slovenia" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=45.8958,15.5969&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-            <a href="https://www.terme-catez.si/en/" target="_blank" class="btn-site">🔗</a>
-          </div>
+      <div class="poi-row">
+        <span class="poi-name">🦇 מערת שקוצ'יאן<span class="day-badge-s">יום 1</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.7039,13.7920&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Skocjan+Caves+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://park-skocjanske-jame.si/en/" target="_blank">כרטיסים</a>
         </div>
       </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🏰 טירת פרדיאמה<span class="day-badge-s">יום 1</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.8162,14.0004&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Predjama+Castle+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.postojnska-jama.eu/en/predjama-castle/" target="_blank">כרטיסים</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🚂 מערת פוסטויניה<span class="day-badge-s">יום 2</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.7817,14.2036&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Postojna+Cave+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.postojnska-jama.eu/en/" target="_blank">כרטיסים</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🏘️ ראסטוקה<span class="day-badge-s">יום 2</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=44.8963,15.6244&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Rastoke+village+Croatia" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🌊 פליטביצה — כניסה 1<span class="day-badge-s">יום 3</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=44.8658,15.6219&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Plitvice+Lakes+Entrance+1" target="_blank">מפה</a>
+          <a class="pb-site" href="https://np-plitvicka-jezera.hr" target="_blank">כרטיסים</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🏊 Terme Čatež<span class="day-badge-s">יום 4</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.8958,15.5969&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Terme+Catez+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.terme-catez.si/en/" target="_blank">אתר</a>
+        </div>
+      </div>
+
+      <div class="poi-label">בסיס 2 — בלד / בוהין</div>
+
+      <div class="poi-row">
+        <span class="poi-name">🛍️ BTC City Ljubljana<span class="day-badge-s">יום 5</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.0897,14.5394&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=BTC+City+Ljubljana" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🏰 אגם בלד + טירה<span class="day-badge-s">יום 6</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3677,14.1139&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Lake+Bled+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.blejski-grad.si/en/" target="_blank">טירה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🎢 סטראזה — מגלשה<span class="day-badge-s">יום 6</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3573,14.1055&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Straza+Bled+summer+toboggan" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.straza-bled.si/en/" target="_blank">אתר</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🌿 ערוץ וינטגר<span class="day-badge-s">יום 7</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3974,14.0875&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Vintgar+Gorge+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.vintgar.si/en" target="_blank">כרטיסים</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🥾 ערוץ מוסטניצה<span class="day-badge-s">יום 8</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.2940,13.9310&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Mostnica+Gorge+Stara+Fuzina" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🚡 וואגל — רכבל<span class="day-badge-s">יום 8</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.2841,13.8486&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Vogel+Cable+Car+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.vogel.si/en/" target="_blank">אתר</a>
+        </div>
+      </div>
+
+      <div class="poi-label">בסיס 3 — עמק הסוצ'ה</div>
+
+      <div class="poi-row">
+        <span class="poi-name">🚂 רכבת המכוניות<span class="day-badge-s">יום 9</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.2622,13.9558&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Bohinjska+Bistrica+train+station" target="_blank">מפה</a>
+          <a class="pb-site" href="https://potniski.sz.si" target="_blank">זמנים</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🏔️ מעבר ורשיץ<span class="day-badge-s">יום 9</span></span>
+        <div class="poi-btns">
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Vrsic+Pass+Slovenia" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">💧 לפנה Virje<span class="day-badge-s">יום 10</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3640,13.5043&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Slap+Virje+Bovec" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🌊 מפל קוזיאק<span class="day-badge-s">יום 10</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.2480,13.5830&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Kozjak+waterfall+Kobarid" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🚣 Sport Mix — ראפטינג<span class="day-badge-s">יום 11</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3368,13.5536&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Sport+Mix+Bovec+Slovenia" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.sportmix.si" target="_blank">אתר</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">💦 Slap Boka — 106 מ'<span class="day-badge-s">יום 12</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3165,13.4974&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Slap+Boka+Bovec" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-label">יום 13 — ונציה</div>
+
+      <div class="poi-row">
+        <span class="poi-name">🅿️ Piazzale Roma — חניה<span class="day-badge-s">יום 13</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.4408,12.3202&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Garage+San+Marco+Piazzale+Roma+Venice" target="_blank">מפה</a>
+          <a class="pb-site" href="https://www.parclick.com" target="_blank">הזמנה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">🛫 Europcar מרקו פולו<span class="day-badge-s">יום 13</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.5052,12.3519&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Europcar+Venice+Marco+Polo+Airport" target="_blank">מפה</a>
+        </div>
+      </div>
+
     </div>
   </div>
 
+  <!-- ACCOMMODATIONS -->
   <div class="sec">
-    <div class="sec-title">🏠 לינות</div>
-    <div class="card">
-      <div style="font-size:13px; line-height:2.4">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span><strong>Vila Lemic</strong> · Postojna</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Rakitnik+30+Postojna" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=45.7784,14.2052&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border)">
-          <span><strong>Flora House</strong> · Rastovača · 💵 מזומן!</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Rastovaca+Plitvicka+Jezera" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=44.8800,15.6200&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0">
-          <span><strong>Guesthouse Les</strong> · Brežice</span>
-          <div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Rimska+cesta+31+Brezice" target="_blank" class="btn-map">📍</a>
-            <a href="https://waze.com/ul?ll=45.9042,15.5903&navigate=yes" target="_blank" class="btn-waze">🔵</a>
-          </div>
+    <div class="sec-title">🏨 לינות</div>
+    <div class="card" style="padding:0 16px">
+
+      <div class="poi-row">
+        <span class="poi-name">Hotel Forte del 48 · יום 0</span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.6340,12.5618&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Hotel+Forte+del+48+San+Dona+di+Piave" target="_blank">מפה</a>
         </div>
       </div>
+
+      <div class="poi-row">
+        <span class="poi-name">Vila Lemic · Postojna · ימים 1–2</span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.7784,14.2052&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Rakitnik+30+Postojna+Slovenia" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">Flora House · Rastovača · ימים 2–3 <span class="lodge-badge">💵 מזומן</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=44.8800,15.6200&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Rastovaca+Plitvicka+Jezera+Croatia" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">Guesthouse Les · Brežice · יום 4</span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=45.9042,15.5903&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Rimska+cesta+31+Brezice+Slovenia" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">Barn House MM · Bled · ימים 5–8</span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3686,14.1139&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Kajuhova+cesta+7a+Bled+Slovenia" target="_blank">מפה</a>
+        </div>
+      </div>
+
+      <div class="poi-row">
+        <span class="poi-name">Charming Bovec Apartment · ימים 9–12 <span class="lodge-badge">📱 App</span></span>
+        <div class="poi-btns">
+          <a class="pb-waze" href="https://waze.com/ul?ll=46.3356,13.5526&navigate=yes" target="_blank">Waze</a>
+          <a class="pb-map" href="https://www.google.com/maps/search/?api=1&query=Dvor+44h+Bovec+Slovenia" target="_blank">מפה</a>
+        </div>
+      </div>
+
     </div>
   </div>
 
 </div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script is:inline define:vars={{ allPoints, route }}>
+  (function () {
+    var el = document.getElementById('fullmap');
+    if (!el || typeof L === 'undefined' || !allPoints.length) return;
+    var map = L.map('fullmap', { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+      subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap, © CARTO'
+    }).addTo(map);
+    if (route && route.length > 1) {
+      L.polyline(route, { color: '#c05a30', weight: 3, opacity: 0.6, dashArray: '8,10' }).addTo(map);
+    }
+    function icon(label, lodge) {
+      var d = lodge ? 30 : 27;
+      return L.divIcon({ className: '', iconSize: [d, d], iconAnchor: [d / 2, d / 2], popupAnchor: [0, -d / 2],
+        html: '<div style="width:' + d + 'px;height:' + d + 'px;border-radius:50%;background:' + (lodge ? '#e0a800' : '#1d9e75') + ';border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.5);color:#fff;font-weight:700;font-size:' + (lodge ? 15 : 12) + 'px;display:flex;align-items:center;justify-content:center;line-height:1">' + label + '</div>' });
+    }
+    function popup(p) {
+      var ll = p.coord[0] + ',' + p.coord[1];
+      return '<div style="min-width:150px"><div style="font-weight:700;font-size:13px;color:#1e140a">' + p.name + '</div>'
+        + '<div style="font-size:11px;color:#888;margin-bottom:7px">יום ' + p.day + '</div>'
+        + '<a href="https://waze.com/ul?ll=' + ll + '&navigate=yes" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#fff;background:#1a1aff;padding:4px 9px;border-radius:5px;text-decoration:none;margin-left:5px">Waze</a>'
+        + '<a href="https://www.google.com/maps/search/?api=1&query=' + ll + '" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#1a4a90;background:#deeafb;padding:4px 9px;border-radius:5px;text-decoration:none">Maps</a></div>';
+    }
+    var pts = [];
+    allPoints.forEach(function (p) {
+      var lodge = p.type === 'lodging';
+      L.marker([p.coord[0], p.coord[1]], { icon: icon(lodge ? '🏨' : p.day, lodge) })
+        .addTo(map).bindPopup(popup(p));
+      pts.push([p.coord[0], p.coord[1]]);
+    });
+    map.fitBounds(pts, { padding: [30, 30] });
+    var me = null;
+    map.on('locationfound', function (e) {
+      if (me) map.removeLayer(me);
+      me = L.circleMarker(e.latlng, { radius: 8, color: '#fff', weight: 3, fillColor: '#1a73e8', fillOpacity: 1 }).addTo(map).bindPopup('📍 אתה כאן');
+    });
+    var LocBtn = L.Control.extend({ options: { position: 'topleft' }, onAdd: function () {
+      var a = L.DomUtil.create('a', 'leaflet-bar');
+      a.href = '#'; a.title = 'המיקום שלי'; a.innerHTML = '📍';
+      a.style.cssText = 'width:34px;height:34px;line-height:34px;text-align:center;font-size:18px;background:#fff;display:block';
+      L.DomEvent.on(a, 'click', function (ev) { L.DomEvent.preventDefault(ev); map.locate({ setView: true, maxZoom: 14 }); });
+      return a;
+    } });
+    map.addControl(new LocBtn());
+  })();
+</script>
 </Base>
