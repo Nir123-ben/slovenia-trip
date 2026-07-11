@@ -254,7 +254,7 @@ const mapPoints = [
           </iframe>
       }
       <div class="map-btns">
-        <a class="btn-waze" href={day.accommodation.wazeUrl} target="_blank" rel="noopener">🔵 Waze ללינה</a>
+        <a class="btn-waze" href={day.accommodation.wazeUrl} target="_blank" rel="noopener">🗺️ ניווט ללינה</a>
         <a class="btn-map"  href={day.accommodation.mapUrl}  target="_blank" rel="noopener">📍 מפה ללינה</a>
         <a class="btn-map"  href={`${base}/map/`} style="background:var(--cream)">🗺️ כל המפה</a>
       </div>
@@ -335,7 +335,7 @@ const mapPoints = [
           <div class="lodge-note">{day.accommodation.notes}</div>
         )}
         <div class="lodge-btns">
-          <a class="lb lb-waze" href={day.accommodation.wazeUrl} target="_blank" rel="noopener">🔵 Waze</a>
+          <a class="lb lb-waze" href={day.accommodation.wazeUrl} target="_blank" rel="noopener">🗺️ ניווט</a>
           <a class="lb lb-map"  href={day.accommodation.mapUrl}  target="_blank" rel="noopener">📍 מפה</a>
         </div>
       </div>
@@ -390,7 +390,7 @@ const mapPoints = [
       var ll = p.coord[0] + ',' + p.coord[1];
       return '<div style="min-width:150px"><div style="font-weight:700;font-size:13px;color:#1e140a">' + p.name + '</div>'
         + '<div style="font-size:11px;color:#888;margin-bottom:7px">יום ' + p.day + '</div>'
-        + '<a href="https://waze.com/ul?ll=' + ll + '&navigate=yes" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#fff;background:#1a1aff;padding:4px 9px;border-radius:5px;text-decoration:none;margin-left:5px">Waze</a>'
+        + '<a href="https://www.google.com/maps/dir/?api=1&destination=' + ll" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#fff;background:#1a1aff;padding:4px 9px;border-radius:5px;text-decoration:none;margin-left:5px">ניווט</a>'
         + '<a href="https://www.google.com/maps/search/?api=1&query=' + ll + '" target="_blank" rel="noopener" style="font-size:11px;font-weight:700;color:#1a4a90;background:#deeafb;padding:4px 9px;border-radius:5px;text-decoration:none">Maps</a></div>';
     }
     var pts = [], n = 0;
